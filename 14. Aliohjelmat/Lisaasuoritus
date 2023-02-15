@@ -1,0 +1,40 @@
+CREATE DEFINER=`testitesti`@`localhost` PROCEDURE `LisaaSuoritus`(
+IN Su VARCHAR(45),
+IN Etu VARCHAR(45),
+IN idopint VARCHAR(45),
+IN Arvos INT
+)
+LisaaSuoritus:Begin
+
+DECLARE OpiskID INT DEFAULT 0;
+DECLARE OpjaksoID INT DEFAULT 0;
+
+
+SELECT idOpiskelija INTO OpiskID FROM Opiskelija WHERE Etunimi=etu AND Sukunimi= su;
+
+
+IF OpiskID = 0 THEN 
+    SELECT 'Opiskelijaa ei ole' AS ErrorMsg;
+    LEAVE LisaaSuoritus;
+END IF;
+
+
+SELECT idOpintojakso INTO OpjaksoID FROM Opintojakso WHERE idopintojakso =idopint;
+
+
+IF OpjaksoID = 0 THEN 
+    SELECT 'Opintojaksoa ei ole' AS ErrorMsg;
+    LEAVE LisaaSuoritus;
+END IF;
+
+
+IF Arvos < 0 OR Arvos > 5 THEN 
+    SELECT 'Virheellinen arvosana' AS ErrorMsg;
+    LEAVE LisaaSuoritus;
+END IF;
+
+
+INSERT INTO Arviointi ( Arvosana, paivays, idOpintojakso,idOpiskelija) 
+VALUES ( arvos, CURDATE(), OpjaksoID,OpiskID);
+
+END
